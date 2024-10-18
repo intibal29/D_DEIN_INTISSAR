@@ -3,14 +3,15 @@ package com.example.ejerd;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
-/**
- * La clase {@code HelloController} es el controlador de la interfaz gráfica de la aplicación.
- * Gestiona la interacción entre la vista (definida en un archivo FXML) y la lógica del programa.
- * Se encarga de manejar la lógica de la aplicación de gestión de personas, incluyendo agregar,
- * modificar, eliminar y seleccionar personas en una tabla.
- */
+import java.io.IOException;
+
 public class HelloController {
 
     // Campos de texto de la interfaz para capturar nombre, apellidos y edad
@@ -34,12 +35,7 @@ public class HelloController {
     // Lista observable que contiene las personas para mostrarlas en la tabla
     private final ObservableList<Persona> listaPersonas = FXCollections.observableArrayList();
 
-    /**
-     * El método {@code initialize} se llama automáticamente después de que se carga la vista FXML.
-     * Inicializa la tabla y asigna las propiedades de cada columna a los campos correspondientes
-     * de los objetos {@code Persona}. También se configura un listener para detectar cuando se
-     * selecciona una persona en la tabla.
-     */
+
     @FXML
     public void initialize() {
         // Enlazar los datos de las columnas con las propiedades de la clase Persona
@@ -58,50 +54,40 @@ public class HelloController {
                 (observable, oldValue, newValue) -> seleccionarPersona());
     }
 
-    /**
-     * Método para agregar una nueva persona a la lista y mostrarla en la tabla.
-     * Valida que los campos no estén vacíos y que la edad sea un número válido.
-     * Muestra una alerta si la persona ya existe en la lista.
-     */
+
     @FXML
     private void agregarPersona() {
-        // Obtener los valores de los campos de texto
-        String nombre = txtNombre.getText();
-        String apellidos = txtApellidos.getText();
-        String edadTexto = txtEdad.getText();
-
-        // Validar que los campos de nombre y apellidos no estén vacíos
-        if (nombre.isEmpty() || apellidos.isEmpty()) {
-            mostrarAlerta("Error", "Nombre y apellidos son obligatorios.");
-            return;
-        }
-
-        // Validar que la edad sea un número entero
-        int edad;
         try {
-            edad = Integer.parseInt(edadTexto);
-        } catch (NumberFormatException e) {
-            mostrarAlerta("Error", "La edad debe ser un número entero.");
-            return;
-        }
+            // Cargar el archivo FXML de la ventana modal
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/ejerd/AgregarPersona.fxml"));
+            Parent root = loader.load();
 
-        // Crear un nuevo objeto Persona
-        Persona nuevaPersona = new Persona(nombre, apellidos, edad);
+            // Crear una nueva escena para la ventana modal
+            Stage stage = new Stage();
+            stage.setTitle("Nueva Persona");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL); // Modal para bloquear la ventana principal
+            stage.setResizable(false); // No permitir cambiar el tamaño de la ventana
 
-        // Verificar si la persona ya existe en la lista
-        if (listaPersonas.contains(nuevaPersona)) {
-            mostrarAlerta("Error", "Esta persona ya existe.");
-        } else {
-            // Agregar la nueva persona a la lista
-            listaPersonas.add(nuevaPersona);
-            mostrarAlerta("Éxito", "Persona agregada correctamente.");
+            // Obtener el controlador de la ventana modal
+            AgregarPersonaController agregarPersonaController = loader.getController();
+
+            // Mostrar la ventana modal y esperar a que se cierre
+            stage.showAndWait();
+
+            // Si los datos son válidos, agregar la persona a la tabla
+            Persona nuevaPersona = agregarPersonaController.getPersona();
+            if (nuevaPersona != null) {
+                listaPersonas.add(nuevaPersona);
+                mostrarAlerta("Éxito", "Persona agregada correctamente.");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    /**
-     * Método que se invoca al seleccionar una persona en la tabla.
-     * Carga los datos de la persona seleccionada en los campos de texto.
-     */
+
+
     @FXML
     private void seleccionarPersona() {
         // Obtener la persona seleccionada de la tabla
@@ -114,84 +100,7 @@ public class HelloController {
         }
     }
 
-    /**
-     * Método para modificar los datos de una persona seleccionada en la tabla.
-     * Valida que se haya seleccionado una persona y que los campos no estén vacíos.
-     * Actualiza los datos de la persona y refresca la tabla.
-     */
-    @FXML
-    private void modificarPersona() {
-        // Obtener la persona seleccionada
-        Persona personaSeleccionada = tablaPersonas.getSelectionModel().getSelectedItem();
 
-        // Validar que se haya seleccionado una persona
-        if (personaSeleccionada == null) {
-            mostrarAlerta("Error", "No hay ninguna persona seleccionada.");
-            return;
-        }
-
-        // Obtener los nuevos valores de los campos de texto
-        String nuevoNombre = txtNombre.getText();
-        String nuevosApellidos = txtApellidos.getText();
-        String nuevaEdadTexto = txtEdad.getText();
-
-        // Validar que los campos no estén vacíos
-        if (nuevoNombre.isEmpty() || nuevosApellidos.isEmpty()) {
-            mostrarAlerta("Error", "Nombre y apellidos son obligatorios.");
-            return;
-        }
-
-        // Validar que la edad sea un número entero
-        int nuevaEdad;
-        try {
-            nuevaEdad = Integer.parseInt(nuevaEdadTexto);
-        } catch (NumberFormatException e) {
-            mostrarAlerta("Error", "La edad debe ser un número entero.");
-            return;
-        }
-
-        // Actualizar los datos de la persona seleccionada
-        personaSeleccionada.setNombre(nuevoNombre);
-        personaSeleccionada.setApellidos(nuevosApellidos);
-        personaSeleccionada.setEdad(nuevaEdad);
-
-        // Refrescar la tabla para mostrar los nuevos datos
-        tablaPersonas.refresh();
-        mostrarAlerta("Éxito", "Persona modificada correctamente.");
-    }
-
-    /**
-     * Método para eliminar la persona seleccionada en la tabla.
-     * Borra los datos de la persona y limpia los campos de texto.
-     */
-    @FXML
-    private void eliminarPersona() {
-        // Obtener la persona seleccionada
-        Persona personaSeleccionada = tablaPersonas.getSelectionModel().getSelectedItem();
-
-        // Validar que se haya seleccionado una persona
-        if (personaSeleccionada == null) {
-            mostrarAlerta("Error", "No hay ninguna persona seleccionada.");
-            return;
-        }
-
-        // Eliminar la persona de la lista
-        listaPersonas.remove(personaSeleccionada);
-
-        // Limpiar los campos de texto
-        txtNombre.clear();
-        txtApellidos.clear();
-        txtEdad.clear();
-
-        mostrarAlerta("Éxito", "Persona eliminada correctamente.");
-    }
-
-    /**
-     * Método auxiliar para mostrar una alerta de información en la interfaz.
-     *
-     * @param titulo  El título de la alerta.
-     * @param mensaje El mensaje que se mostrará en la alerta.
-     */
     private void mostrarAlerta(String titulo, String mensaje) {
         Alert alerta = new Alert(Alert.AlertType.INFORMATION);
         alerta.setTitle(titulo);
