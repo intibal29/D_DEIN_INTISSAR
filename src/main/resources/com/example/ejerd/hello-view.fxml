@@ -3,15 +3,13 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="443.0" prefWidth="626.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.C.HelloController">
-    <children>
-        <TableView fx:id="tablaPersonas" layoutX="22.0" layoutY="14.0" prefHeight="371.0" prefWidth="589.0">
-            <columns>
-                <TableColumn fx:id="colNombre" prefWidth="284.0" text="NOMBRE" />
-                <TableColumn fx:id="colApellidos" minWidth="0.0" prefWidth="155.0" text="APELLIDOS" />
-                <TableColumn fx:id="colEdad" prefWidth="144.0" text="EDAD" />
-            </columns>
-        </TableView>
-        <Button fx:id="btnAgregarPersona" layoutX="223.0" layoutY="405.0" mnemonicParsing="false" onAction="#agregarPersona" text="Agregar Persona" />
-    </children>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="443.0" prefWidth="626.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.ejerd.HelloController">
+    <TableView fx:id="tablaPersonas" layoutX="22.0" layoutY="14.0" prefHeight="371.0" prefWidth="589.0">
+        <columns>
+            <TableColumn fx:id="colNombre" prefWidth="284.0" text="NOMBRE" />
+            <TableColumn fx:id="colApellidos" minWidth="0.0" prefWidth="155.0" text="APELLIDOS" />
+            <TableColumn fx:id="colEdad" prefWidth="149.0" text="EDAD" />
+        </columns>
+    </TableView>
+    <Button fx:id="btnAgregarPersona" layoutX="223.0" layoutY="405.0" mnemonicParsing="false" onAction="#agregarPersona" text="Agregar Persona" />
 </AnchorPane>
